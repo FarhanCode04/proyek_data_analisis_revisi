@@ -139,11 +139,14 @@ ax.set_title("Distribusi Antar Musim", fontsize=25)
 
 # Menampilkan plot di Streamlit
 st.pyplot(fig)
+
+seasons = ["Spring", "Summer", "Fall", "Winter"]
 st.sidebar.header("Bandingkan Musim")
 season1 = st.sidebar.selectbox("Pilih Musim 1", seasons, key="season1")
 season2 = st.sidebar.selectbox("Pilih Musim 2", seasons, key="season2")
 
 if season1 and season2:
+    season_mapping = {"Spring": 1, "Summer": 2, "Fall": 3, "Winter": 4}
     season1_df = main_df_days[main_df_days["season"] == season_mapping[season1]]
     season2_df = main_df_days[main_df_days["season"] == season_mapping[season2]]
 
