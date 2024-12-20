@@ -42,12 +42,15 @@ min_date_hour = hour["dteday"].min()
 max_date_hour = hour["dteday"].max()
 
 with st.sidebar:
+
+    
+        
     start_date, end_date = st.date_input(
         label='Rentang Waktu',
         min_value=min_date_days,
         max_value=max_date_days,
         value=[min_date_days, max_date_days])
-
+  
 main_df_days = day[(day["dteday"] >= str(start_date)) & 
                        (day["dteday"] <= str(end_date))]
 
@@ -77,7 +80,6 @@ ax[0].tick_params(axis='x', labelsize=20)
 ax[0].set_ylim(0, sum_order_items_df["total_count"].max() * 1.1)  # Memberikan ruang di atas maksimum
  
 sns.barplot(x="hour", y="total_count", data=sum_order_items_df.sort_values(by="hour", ascending=True).head(5), palette="YlGnBu", ax=ax[1])
-ax[1].legend_.remove()  # Menghapus legend karena tidak diperlukan
 ax[1].set_xlabel("Jam (AM)", fontsize=24)
 ax[1].set_ylabel("Jumlah Penyewaan", fontsize=24)
 ax[1].set_title("Jam dengan Penyewa Sepeda Terdikit", loc="center", fontsize=26)
@@ -115,7 +117,7 @@ ax.legend()
 st.pyplot(fig)
 
 
-st.subheader("musim apa yang paling banyak disewa?")
+st.subheader("Frekuensi peminjaman sepeda pada setiap musim")
 season_counts = day.groupby("season", observed=False)["total_count"].sum()
 
 # Warna untuk setiap musim
@@ -137,4 +139,5 @@ ax.set_title("Distribusi Antar Musim", fontsize=25)
 
 # Menampilkan plot di Streamlit
 st.pyplot(fig)
+
 
