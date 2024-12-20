@@ -140,34 +140,3 @@ ax.set_title("Distribusi Antar Musim", fontsize=25)
 # Menampilkan plot di Streamlit
 st.pyplot(fig)
 
-# Sidebar untuk memilih musim
-seasons = ["Spring", "Summer", "Fall", "Winter"]
-season_mapping = {"Spring": 1, "Summer": 2, "Fall": 3, "Winter": 4}
-st.sidebar.header("Bandingkan Musim")
-season1 = st.sidebar.selectbox("Pilih Musim 1", seasons, key="season1")
-season2 = st.sidebar.selectbox("Pilih Musim 2", seasons, key="season2")
-
-if season1 and season2:
-    # Filter data
-    season1_df = main_df_days[main_df_days["season"] == season_mapping[season1]]
-    season2_df = main_df_days[main_df_days["season"] == season_mapping[season2]]
-
-    # Check if data is available
-    if season1_df.empty or season2_df.empty:
-        st.warning("Data tidak tersedia untuk musim yang dipilih.")
-    else:
-        # Group and compare data
-        season_comparison = pd.concat([
-            season1_df.groupby("dteday")["total_count"].sum().rename(f"{season1}"),
-            season2_df.groupby("dteday")["total_count"].sum().rename(f"{season2}")
-        ], axis=1).fillna(0)
-
-        # Plot data
-        st.subheader(f"Perbandingan Penyewaan Sepeda: {season1} vs {season2}")
-        fig, ax = plt.subplots(figsize=(12, 6))
-        season_comparison.plot(ax=ax)
-        ax.set_title(f"Perbandingan Penyewaan Sepeda: {season1} vs {season2}", fontsize=16)
-        ax.set_xlabel("Tanggal", fontsize=14)
-        ax.set_ylabel("Jumlah Penyewaan", fontsize=14)
-        ax.legend(title="Musim", fontsize=12)
-        st.pyplot(fig)
