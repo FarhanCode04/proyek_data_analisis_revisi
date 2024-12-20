@@ -139,4 +139,18 @@ ax.set_title("Distribusi Antar Musim", fontsize=25)
 
 # Menampilkan plot di Streamlit
 st.pyplot(fig)
+st.sidebar.header("Bandingkan Musim")
+season1 = st.sidebar.selectbox("Pilih Musim 1", seasons, key="season1")
+season2 = st.sidebar.selectbox("Pilih Musim 2", seasons, key="season2")
 
+if season1 and season2:
+    season1_df = main_df_days[main_df_days["season"] == season_mapping[season1]]
+    season2_df = main_df_days[main_df_days["season"] == season_mapping[season2]]
+
+    season_comparison = pd.concat([
+        season1_df.groupby("dteday")["total_count"].sum().rename(f"{season1}"),
+        season2_df.groupby("dteday")["total_count"].sum().rename(f"{season2}")
+    ], axis=1).fillna(0)
+
+    st.subheader(f"Perbandingan Penyewaan Sepeda: {season1} vs {season2}")
+    st.line_chart(season_comparison)
