@@ -87,6 +87,12 @@ ax[1].tick_params(axis='y', labelsize=20)
 ax[1].tick_params(axis='x', labelsize=20)
 ax[1].set_ylim(0, sum_order_items_df["total_count"].max() * 1.1)  # Memberikan ruang di atas maksimum
 st.pyplot(fig)
+# Display Line Chart for Trends over Time
+st.subheader("Tren Penyewaan Sepeda")
+st.line_chart(line_chart.set_index("dteday"))
+
+# Other visualizations (Pie chart for seasons, bar chart for monthly performance)
+st.subheader("Frekuensi peminjaman sepeda pada setiap musim")
 
 
 st.subheader("Performa penjualan perusahaan dalam beberapa tahun terakhir")
