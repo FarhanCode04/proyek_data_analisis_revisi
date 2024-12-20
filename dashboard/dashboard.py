@@ -6,7 +6,7 @@ import streamlit as st
 sns.set(style='dark')
 
 def get_total_count_by_hour_df(hour):
-    hour_count_df = hour.groupby(by="hour").agg({"total_count": ["sum"]})
+    hour_count_df = hour.groupby(by="hour").agg({"total_count": ["sum"]})  
     return hour_count_df
 
 def count_by_day_df(day):
@@ -25,12 +25,13 @@ def macem_season(day):
 day = pd.read_csv("dashboard/day_cleaned.csv")
 hour = pd.read_csv("dashboard/hour_cleaned.csv")
 
+# Sort and preprocess data
 datetime_columns = ["dteday"]
 day.sort_values(by="dteday", inplace=True)
-day.reset_index(inplace=True)
+day.reset_index(drop=True, inplace=True)
 
 hour.sort_values(by="dteday", inplace=True)
-hour.reset_index(inplace=True)
+hour.reset_index(drop=True, inplace=True)
 
 for column in datetime_columns:
     day[column] = pd.to_datetime(day[column])
@@ -44,11 +45,13 @@ max_date_hour = hour["dteday"].max()
 
 # Sidebar filters
 with st.sidebar:
+    # Date range filter
     start_date, end_date = st.date_input(
         label='Rentang Waktu',
         min_value=min_date_days,
         max_value=max_date_days,
-        value=[min_date_days, max_date_days])
+        value=[min_date_days, max_date_days]
+    )
 
     # Filter by season
     selected_season = st.multiselect(
@@ -57,11 +60,15 @@ with st.sidebar:
         default=["Fall"]
     )
 
-    # Filter by weather situation
-    selected_weather = st.selectbox(
-        "Pilih Kondisi Cuaca",
-        options=day["weathersit"].unique()
-    )
+    # Filter by weather situation (if column exists)
+    if "weathersit" in day.columns:
+        selected_weather = st.selectbox(
+            "Pilih Kondisi Cuaca",
+            options=day["weathersit"].unique()
+        )
+    else:
+        st.warning("Kolom 'weathersit' tidak ditemukan di dataset.")
+        selected_weather = None
 
 # Apply filters to data
 main_df_days = day[(day["dteday"] >= str(start_date)) & 
@@ -74,9 +81,11 @@ if selected_season:
     main_df_days = main_df_days[main_df_days["season"].isin(selected_season)]
     main_df_hour = main_df_hour[main_df_hour["season"].isin(selected_season)]
 
-main_df_days = main_df_days[main_df_days["weathersit"] == selected_weather]
-main_df_hour = main_df_hour[main_df_hour["weathersit"] == selected_weather]
+if selected_weather:
+    main_df_days = main_df_days[main_df_days["weathersit"] == selected_weather]
+    main_df_hour = main_df_hour[main_df_hour["weathersit"] == selected_weather]
 
+# Aggregations
 hour_count_df = get_total_count_by_hour_df(main_df_hour)
 day_df_count_2011 = count_by_day_df(main_df_days)
 sum_order_items_df = sum_order(main_df_hour)
@@ -85,7 +94,7 @@ season_df = macem_season(main_df_hour)
 # Dashboard visualizations
 st.header('Bike Sharing Data Analysis')
 
-# Visualization 1
+# Visualization 1: Peak and low bike rentals by hour
 st.subheader("Waktu penyewaan sepeda paling tinggi dan paling rendah dalam 1 hari")
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(25, 12))
 
@@ -108,9 +117,8 @@ ax[1].tick_params(axis='x', labelsize=20)
 ax[1].set_ylim(0, sum_order_items_df["total_count"].max() * 1.1)
 st.pyplot(fig)
 
-# Visualization 2
+# Visualization 2: Monthly rental performance
 st.subheader("Performa penjualan perusahaan dalam beberapa tahun terakhir")
-day['dteday'] = pd.to_datetime(day['dteday'])
 monthly_counts = day.groupby(day['dteday'].dt.to_period('M'))['total_count'].max()
 
 fig, ax = plt.subplots(figsize=(24, 5))
@@ -124,7 +132,7 @@ ax.tick_params(axis='y', labelsize=12)
 ax.legend()
 st.pyplot(fig)
 
-# Visualization 3
+# Visualization 3: Seasonal rentals
 st.subheader("Musim apa yang paling banyak disewa?")
 season_counts = day.groupby("season", observed=False)["total_count"].sum()
 colors = ["#FFA07A", "#90CAF9", "#8FBC8F", "#D3D3D3"]
@@ -140,5 +148,3 @@ ax.pie(
 )
 ax.set_title("Distribusi Antar Musim", fontsize=25)
 st.pyplot(fig)
-
-
