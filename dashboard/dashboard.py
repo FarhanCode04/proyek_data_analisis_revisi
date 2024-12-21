@@ -88,6 +88,15 @@ ax[1].tick_params(axis='x', labelsize=20)
 ax[1].set_ylim(0, sum_order_items_df["total_count"].max() * 1.1)  # Memberikan ruang di atas maksimum
 st.pyplot(fig)
 
+# Fitur interaktif baru: Line Chart Tren Penyewaan Sepeda
+st.subheader("Tren Penyewaan Sepeda")
+line_chart_data = main_df_days.groupby("dteday")["total_count"].sum().reset_index()
+
+if line_chart_data.empty:
+    st.warning("Tidak ada data untuk rentang waktu yang dipilih.")
+else:
+    st.line_chart(line_chart_data.set_index("dteday"))
+
 
 st.subheader("Performa penjualan perusahaan dalam beberapa bulan terakhir")
 # Pastikan kolom tanggal diformat dengan benar
