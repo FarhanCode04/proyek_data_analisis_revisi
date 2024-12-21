@@ -89,7 +89,7 @@ ax[1].set_ylim(0, sum_order_items_df["total_count"].max() * 1.1)  # Memberikan r
 st.pyplot(fig)
 
 
-st.subheader("Performa penjualan perusahaan dalam beberapa tahun terakhir")
+st.subheader("Performa penjualan perusahaan dalam beberapa bulan terakhir")
 # Pastikan kolom tanggal diformat dengan benar
 day['dteday'] = pd.to_datetime(day['dteday'])
 
